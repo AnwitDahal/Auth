@@ -5,7 +5,7 @@ const { generateVerifyCode } = require("../utils/generateVerifyCode");
 const {
   generateTokenAndSetCookie,
 } = require("../utils/generateTokenAndSetCookie");
-const { sendVerificationEmail, sendWelcomeEmail, sendForgotPasswordEmail } = require("../nodemailer/emails");
+const { sendVerificationEmail, sendWelcomeEmail, sendForgotPasswordEmail, sendResetPasswordSuccessfullEmail } = require("../nodemailer/emails");
 
 module.exports.signup = async (req, res) => {
   const { email, password, name } = req.body;
@@ -172,6 +172,48 @@ module.exports.forgotPassword=async(req,res)=>{
     })
   } catch (error) {
     console.log("Error in forgotPassword :",error);
+    res.status(400).json({
+      success:false,
+      message:error.message
+    })
+  }
+}
+
+module.exports.resetPassword=async(req,res)=>{
+  try {
+    const {token}=req.params;
+    const {password}=req.body;
+    const user=await userModel.findOne({
+      resetPasswordToken:token,
+      resetPasswordExpiresAt:{$gt : Date.now()}
+    })
+
+    if(!user){
+      return res.status(400).json({
+        success:false,
+        message:"Invalid or expired reset token"
+      })
+    }
+
+    //update password
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(password, salt);
+    user.password=hash;
+
+    user.resetPasswordToken=undefined;
+    user.resetPasswordExpiresAt=undefined;
+
+    await user.save();
+
+    await sendResetPasswordSuccessfullEmail(user.email);
+
+    res.status(400).json({
+      success:true,
+      message:"Password reset successful"
+    })
+
+  } catch (error) {
+    console.log("Error in resetPassword :",error);
     res.status(400).json({
       success:false,
       message:error.message
