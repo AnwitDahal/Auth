@@ -2,6 +2,7 @@
   const bcrypt = require("bcrypt");
   const { generateVerifyCode } = require("../utils/generateVerifyCode");
   const { generateTokenAndSetCookie } = require("../utils/generateTokenAndSetCookie");
+const { sendVerificationEmail } = require("../nodemailer/emails");
 
   module.exports.signup = async (req, res) => {
     const { email, password, name } = req.body;
@@ -36,6 +37,8 @@
 
       //jwt
       generateTokenAndSetCookie(res, user._id);
+
+      await sendVerificationEmail(user.email,verificationToken)
 
       res.status(201).json({
         success: true,
