@@ -96,7 +96,44 @@ module.exports.verifyEmail = async (req, res) => {
 };
 
 module.exports.login = async (req, res) => {
-  res.send("login");
+  const {email,password}=req.body;
+  try {
+    const user = await userModel.findOne({email})
+    
+    if(!user){
+      return res.status(400).json({
+        success:false,
+        message:"Invalid Email or Password"
+      })
+    }
+
+    const passwordValidation=bcrypt.compareSync(password, user.password);
+    if(!passwordValidation){
+      return res.status(400).json({
+        success:false,
+        message:"Invalid Email or Password"
+      })
+    }
+    generateTokenAndSetCookie(res,user._id)
+
+    user.lastLogin= new Date();
+    await user.save();
+
+    return res.status(200).json({
+      success:true,
+      message:"LoggedIn Successfully",
+      user:{
+        ...user._doc,
+        password:undefined,
+      },
+    })
+  } catch (err) {
+    console.log("Error in Login !:",err);
+    res.status(400).json({
+      success:false,
+      message:err.message
+    })
+  }
 };
 
 module.exports.logout = async (req, res) => {
