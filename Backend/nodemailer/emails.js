@@ -1,4 +1,4 @@
-const { VERIFICATION_EMAIL_TEMPLATE } = require("./emailTemplate");
+const { VERIFICATION_EMAIL_TEMPLATE, WELCOME_EMAIL_TEMPLATE } = require("./emailTemplate");
 const { transporter } = require("./nodemailerconfig");
 
 module.exports.sendVerificationEmail = async (email, verificationToken) => {
@@ -13,6 +13,23 @@ module.exports.sendVerificationEmail = async (email, verificationToken) => {
       ),
     });
     console.log("Email send successfully", response);
+  } catch (err) {
+    console.error(`Error sending verification`, err);
+    throw new Error(`Error sending verification email:${err}`);
+  }
+};
+module.exports.sendWelcomeEmail = async (email, name) => {
+  try {
+    const response = await transporter.sendMail({
+      from: process.env.EMAIL,
+      to: email,
+      subject: "Welcome to our App",
+      html: WELCOME_EMAIL_TEMPLATE.replace(
+        "{name}",
+        name
+      ),
+    });
+    console.log("Welcome Email send successfully", response);
   } catch (err) {
     console.error(`Error sending verification`, err);
     throw new Error(`Error sending verification email:${err}`);

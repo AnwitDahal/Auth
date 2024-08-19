@@ -4,7 +4,7 @@ const { generateVerifyCode } = require("../utils/generateVerifyCode");
 const {
   generateTokenAndSetCookie,
 } = require("../utils/generateTokenAndSetCookie");
-const { sendVerificationEmail } = require("../nodemailer/emails");
+const { sendVerificationEmail, sendWelcomeEmail } = require("../nodemailer/emails");
 
 module.exports.signup = async (req, res) => {
   const { email, password, name } = req.body;
@@ -76,7 +76,23 @@ module.exports.verifyEmail = async (req, res) => {
     await user.save();
 
     await sendWelcomeEmail(user.email, user.name);
-  } catch (error) {}
+
+    res.status(200).json({
+      sucess:true,
+      message:"Email verified successfully",
+      user:{
+        ...user._doc,
+        password:undefined,
+
+      }
+    })
+  } catch (error) {
+    console.log("error in verifyEmail",error);
+    res.status(500).json({
+      success:false,
+      message:`Server Error`    
+    })
+  }
 };
 
 module.exports.login = async (req, res) => {
