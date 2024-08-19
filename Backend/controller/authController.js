@@ -1,10 +1,11 @@
 const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const crypto=require('crypto')
 const { generateVerifyCode } = require("../utils/generateVerifyCode");
 const {
   generateTokenAndSetCookie,
 } = require("../utils/generateTokenAndSetCookie");
-const { sendVerificationEmail, sendWelcomeEmail } = require("../nodemailer/emails");
+const { sendVerificationEmail, sendWelcomeEmail, sendForgotPasswordEmail } = require("../nodemailer/emails");
 
 module.exports.signup = async (req, res) => {
   const { email, password, name } = req.body;
@@ -143,3 +144,37 @@ module.exports.logout = async (req, res) => {
     message:"Logged Out Successfully"
   })
 };
+
+module.exports.forgotPassword=async(req,res)=>{
+  const {email}=req.body;
+  try {
+    const user=await userModel.findOne({email})
+    if (!user){
+      return res.status(400).json({
+        success:false,
+        message:"Email not found"
+      })
+    }
+
+    //generating reset token
+    const resetToken=crypto.randomBytes(20).toString('hex');
+    const resetTokenExpires=Date.now()+ 1*60*60*1000  //1 hrs
+
+    user.resetPasswordToken=resetToken;
+    user.resetPasswordExpiresAt=resetTokenExpires;
+
+    await user.save();
+    await sendForgotPasswordEmail(user.email,`${process.env.CLIENT_URL}/reset-password/${resetToken}`);
+
+    res.status(400).json({
+      success:true,
+      message:"Password reset link sent to your email"
+    })
+  } catch (error) {
+    console.log("Error in forgotPassword :",error);
+    res.status(400).json({
+      success:false,
+      message:error.message
+    })
+  }
+}
