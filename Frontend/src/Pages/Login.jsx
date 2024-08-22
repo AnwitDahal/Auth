@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const isLoading=false;
+  const isLoading = false;
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -42,8 +42,11 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           <div className="flex items-center mb-6">
-            <Link to='/forgot-password' className="text-sm text-blue-400 hover:underline">
-            Forgot Password?
+            <Link
+              to="/forgot-password"
+              className="text-sm text-blue-400 hover:underline"
+            >
+              Forgot Password?
             </Link>
           </div>
           <motion.button
@@ -56,7 +59,11 @@ const Login = () => {
             type="submit"
             disabled={isLoading}
           >
-           {isLoading ? <Loader className="size-6 animate-spin mx-auto"/> : "Login"}
+            {isLoading ? (
+              <Loader className="size-6 animate-spin mx-auto" />
+            ) : (
+              "Login"
+            )}
           </motion.button>
         </form>
       </div>
