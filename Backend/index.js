@@ -19,10 +19,10 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(dirname, "/frontend/dist")));
+  app.use(express.static(path.join(dirname, "/Frontend/dist")));
 
   app.get("*", (req, res) => {
-    res.sendFile(path.resolve(dirname, "frontend", "dist", "index.html"));
+    res.sendFile(path.resolve(dirname, "Frontend", "dist", "index.html"));
   });
 }
 
