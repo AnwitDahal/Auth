@@ -150,7 +150,7 @@ module.exports.forgotPassword=async(req,res)=>{
   try {
     const user=await userModel.findOne({email})
     if (!user){
-      return res.status(400).json({
+      return res.status(404).json({
         success:false,
         message:"Email not found"
       })
@@ -166,7 +166,7 @@ module.exports.forgotPassword=async(req,res)=>{
     await user.save();
     await sendForgotPasswordEmail(user.email,`${process.env.CLIENT_URL}/reset-password/${resetToken}`);
 
-    res.status(400).json({
+    res.status(200).json({
       success:true,
       message:"Password reset link sent to your email"
     })
@@ -207,14 +207,14 @@ module.exports.resetPassword=async(req,res)=>{
 
     await sendResetPasswordSuccessfullEmail(user.email);
 
-    res.status(400).json({
+    res.status(200).json({
       success:true,
       message:"Password reset successful"
     })
 
   } catch (error) {
     console.log("Error in resetPassword :",error);
-    res.status(400).json({
+    res.status(500).json({
       success:false,
       message:error.message
     })
