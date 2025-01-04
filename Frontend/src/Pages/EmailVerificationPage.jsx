@@ -9,7 +9,7 @@ const EmailVerificationPage = () => {
   const inputRefs = useRef([]);
   const navigate = useNavigate();
 
-  const { error, isLoading, verifyEmail } = useAuthStore();
+  const { error, isLoading, verifyEmail,resetError  } = useAuthStore();
 
   const handleChange = (index, value) => {
     const newCode = [...code];
@@ -59,7 +59,8 @@ const EmailVerificationPage = () => {
     if (code.every((digit) => digit !== "")) {
       handleSubmit(new Event("submit"));
     }
-  }, [code]);
+    return () => resetError();
+  }, [code,resetError]);
 
   return (
     <div className="max-w-md w-full bg-slate-800 bg-opacity-50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden">

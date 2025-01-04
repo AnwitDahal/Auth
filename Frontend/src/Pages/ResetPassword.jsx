@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "../store/AuthStore";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { resetPassword, error, isLoading, message } = useAuthStore();
+  const { resetPassword, error, isLoading, message,resetError } = useAuthStore();
 
   const { token } = useParams();
   const navigate = useNavigate();
@@ -36,6 +36,10 @@ const ResetPassword = () => {
     }
   };
 
+  useEffect(() => {
+    // Reset error when component unmounts
+    return () => resetError();
+  }, [resetError]);
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

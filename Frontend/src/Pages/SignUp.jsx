@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Input from "../components/Input";
 import { Loader, Lock, Mail, Trophy, User } from "lucide-react";
@@ -12,7 +12,7 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const navigate=useNavigate();
 
-  const {signup,error,isLoading}=useAuthStore();
+  const {signup,error,isLoading,resetError}=useAuthStore();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -26,6 +26,9 @@ const SignUp = () => {
       
     }
   };
+  useEffect(() => {
+    return () => resetError();
+  }, [resetError]);
   return (
     <motion.div
       initial={{

@@ -67,7 +67,7 @@ module.exports.verifyEmail = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: "Invalid or expiredVerification Code",
+        message: "Invalid or expired Verification Code",
       });
     }
 
